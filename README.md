@@ -185,13 +185,13 @@ WaveSQL/
 ## 👤 Автор
 - Darov Alexander (eelus1ve)
 - Email: darov-alexander@outlook.com
-- GitHub: @eelus1ve
+- GitHub: [`@eelus1ve`](https://github.com/eelus1ve)
 - Разработано в рамках WaveTeam
 
 ---
 
 ## 🔗 Ссылки
-- 🌍 Репозиторий: github.com/WaveTeamDevs/WaveSQL
-- 🧠 Организация: WaveTeamDevs
+- 🌍 Репозиторий: [`github.com/WaveTeamDevs/WaveSQL`](https://github.com/WaveTeamDevs/WaveSQL)
+- 🧠 Организация: [`WaveTeamDevs`](https://github.com/WaveTeamDevs)
 
 ---
