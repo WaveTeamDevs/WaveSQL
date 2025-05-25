@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-class DataBase(AsyncWaveSQL):
+class AsyncDataBase(AsyncWaveSQL):
     def __init__(
         self, config: dict | str | None = None, path_to_sql: Path | str | None = None,
         is_dictionary: bool = True, is_console_log: bool = False, is_log_backtrace: bool = False,
