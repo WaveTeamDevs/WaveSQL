@@ -1,6 +1,6 @@
 # 🌊 WaveSQL
 
-**WaveSQL** — лёгкая, но мощная Python-библиотека для безопасной, асинхронной и удобной работы с MySQL и MariaDB.
+**WaveSQL** — лёгкая, но мощная Python-библиотека для безопасной, синхронной и асинхронной работы с MySQL и MariaDB.
 
 > Разработано [`WaveTeam`](https://github.com/WaveTeamDevs) под руководством [`eelus1ve`](https://github.com/eelus1ve)
 
@@ -25,13 +25,6 @@
 
 ```bash
 pip install wavesql
-```
-
-Пока не опубликовано на PyPI — клонируй вручную:
-```bash
-git clone https://github.com/WaveTeamDevs/WaveSQL.git
-cd WaveSQL
-pip install -e .
 ```
 
 ## 🧰 Использование
@@ -192,13 +185,13 @@ WaveSQL/
 ## 👤 Автор
 - Darov Alexander (eelus1ve)
 - Email: darov-alexander@outlook.com
-- GitHub: @eelus1ve
+- GitHub: [`@eelus1ve`](https://github.com/eelus1ve)
 - Разработано в рамках WaveTeam
 
 ---
 
 ## 🔗 Ссылки
-- 🌍 Репозиторий: github.com/WaveTeamDevs/WaveSQL
-- 🧠 Организация: WaveTeamDevs
+- 🌍 Репозиторий: [`github.com/WaveTeamDevs/WaveSQL`](https://github.com/WaveTeamDevs/WaveSQL)
+- 🧠 Организация: [`WaveTeamDevs`](https://github.com/WaveTeamDevs)
 
 ---
