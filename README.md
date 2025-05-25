@@ -27,13 +27,6 @@
 pip install wavesql
 ```
 
-Пока не опубликовано на PyPI — клонируй вручную:
-```bash
-git clone https://github.com/WaveTeamDevs/WaveSQL.git
-cd WaveSQL
-pip install -e .
-```
-
 ## 🧰 Использование
 
 🔹 Простой пример
