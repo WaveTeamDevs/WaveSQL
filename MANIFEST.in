@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include NOTICE
+recursive-include wavesql *.ini
+recursive-include wavesql/sql *.sql
+recursive-include wavesql/python *.py

@@ -1,0 +1,27 @@
+[project]
+name = "WaveSQL"
+version = "1.0.0"
+description = "SQL helper for databases"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "Apache-2.0"}
+
+authors = [
+  { name = "Darov Alexander Rostislavovich", email = "darov-alexander@outlook.com" }
+]
+
+maintainers = [
+  { name = "eelus1ve (Darov Alexander)", email = "darov-alexander@outlook.com" }
+]
+
+dependencies = [
+  "mysql-connector-python==9.3.0",
+  "colorama==0.4.6"
+]
+
+[project.urls]
+homepage = "https://github.com/WaveTeamDevs/WaveSQL"
+repository = "https://github.com/WaveTeamDevs/WaveSQL"
+bug-tracker = "https://github.com/WaveTeamDevs/WaveSQL/issues"
+organization = "https://github.com/WaveTeamDevs"
+author-profile = "https://github.com/eelus1ve"
