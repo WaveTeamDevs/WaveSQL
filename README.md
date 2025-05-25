@@ -50,7 +50,7 @@ db.log(level=3, data="All is good!")
 ## 🌀 Асинхронная версия
 
 ```python
-from wavesql.async_version import AsyncWaveSQL
+from wavesql import AsyncWaveSQL
 
 async_db = AsyncWaveSQL(
     is_dictionary=True,
@@ -63,7 +63,7 @@ await async_db.log(level=3, data="Async logging works!")
 ```
 
 # Все методы и поведение идентичны синхронной версии
-# Просто используйте await, и импортируйте из wavesql.async_version
+# Просто используйте await, и импортируйте из wavesql AsyncWaveSQL
 
 ---
 
