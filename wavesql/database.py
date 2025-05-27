@@ -1,5 +1,10 @@
 # Copyright 2025 eelus1ve and the WaveTeam
 #
+# GitHub (author): https://github.com/eelus1ve
+# GitHub (organization): https://github.com/WaveTeamDevs
+# Repository: https://github.com/WaveTeamDevs/WaveSQL
+# Website: https://waveteam.net
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -41,7 +46,7 @@ else:
     from .constants import PATH_DB_INIT_SCRIPTS, CONFIG_PATH, LOG_COLORS
     from .sqlFileObject import SqlFileObject, SqlFileQueries
 
-colorama.init()
+colorama.init(autoreset=True)
 
 
 def read_files_to_vars(directory: str):
@@ -56,7 +61,6 @@ def read_files_to_vars(directory: str):
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 file_contents[file_path.name] = content
-                print(f"File read: {file_path.name}")
 
     return file_contents
 
@@ -64,13 +68,29 @@ def read_files_to_vars(directory: str):
 class WaveSQL:
     """Example:\n
         db = WaveDataBase(is_dictionary=True, is_console_log=True, is_log_backtrace=True, is_auto_start=True)\n
-        db.log(level=3, data="All is good!")
+        db.log(level=3, text="All is good!")
+        
+    default_log_level : int, optional
+        Logging level indicating the type of message. Default is 1 (INFO).
+
+        Available levels:
+        - 1: INFO — general information (color: CYAN)
+        - 2: DEBUG — debug information (color: MAGENTA)
+        - 3: OK — successful operation (color: GREEN)
+        - 4: WARNING — warning that does not affect execution (color: YELLOW)
+        - 5: FAILURE — logic or business error (color: RED)
+        - 6: EXPECTED ERROR — an expected error (color: RED)
+        - 7: UNEXPECTED ERROR — an unexpected error (color: RED)
+        - 8: ERROR — general error (color: RED)
+        - 9: FATAL ERROR — critical error requiring immediate attention (color: LIGHTRED)
     """
     def __init__(
         self, config: dict | str | None = None, path_to_sql: Path | str | None = None, is_dictionary: bool = False,
         is_console_log: bool = False, is_log_backtrace: bool = False, raise_log_on_fail: bool = False,
         is_pprint: bool = False, is_protected: bool = True, is_auto_start: bool = False, is_try_update_db: bool = False,
-        is_create_python_bridge: bool = False, is_try_update_python_bridge: bool = True
+        is_create_python_bridge: bool = False, is_try_update_python_bridge: bool = True, default_log_sep: str = " ",
+        default_log_module: str = "DATABASE", default_log_level: int | Literal[1, 2, 3, 4, 5, 6, 7, 8, 9] = 1
+        
     ) -> None:
         if not isinstance(config, dict):
             if config is None:
@@ -105,13 +125,22 @@ class WaveSQL:
         self.is_protected = is_protected
         if not isinstance(is_try_update_db, bool):
             raise TypeError(f"Expected 'is_try_update_db' to be of type bool (True or False), but got: {type(is_try_update_db).__name__}")
-        self.is_try_update_db = is_try_update_db
+        self.__is_try_update_db = is_try_update_db
         if not isinstance(is_create_python_bridge, bool):
             raise TypeError(f"Expected 'is_create_python_bridge' to be of type bool (True or False), but got: {type(is_create_python_bridge).__name__}")
-        self.is_create_python_bridge = is_create_python_bridge
+        self.__is_create_python_bridge = is_create_python_bridge
         if not isinstance(is_try_update_python_bridge, bool):
             raise TypeError(f"Expected 'is_try_update_python_bridge' to be of type bool (True or False), but got: {type(is_try_update_python_bridge).__name__}")
-        self.is_try_update_python_bridge = is_try_update_python_bridge
+        self.__is_try_update_python_bridge = is_try_update_python_bridge
+        if not isinstance(default_log_sep, str):
+            self.default_log_sep = str(default_log_sep)
+        self.default_log_sep = default_log_sep
+        if not isinstance(default_log_module, str):
+            self.default_log_module = str(default_log_module)
+        self.default_log_module = default_log_module
+        if not isinstance(default_log_level, int):
+            raise TypeError(f"Expected 'default_log_level' to be of type int (worked examples in (1, 2, 3, 4, 5, 6, 7, 8, 9)), but got: {type(default_log_level).__name__}")
+        self.default_log_level = default_log_level
         
         self.__db_init_succsess = False
 
@@ -149,7 +178,7 @@ class WaveSQL:
         
         found_filenames = {p.name for p in all_sql_paths}
         missing_files = required_files - found_filenames
-        sql_file_objects = []
+        sql_file_objects: list[SqlFileObject] = []
         if missing_files:
             local_sql_dir = self.local_dir / "sql"
             if not local_sql_dir.exists():
@@ -162,21 +191,21 @@ class WaveSQL:
                 
                 dest_file.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy(src_file, dest_file)
-                print(f"Copied file {file_name} from local folder to {dest_file}")
+                self.__print_log(backtrace=None, def_level="INFO", def_color="CYAN", def_module="DATABASE", def_msg=f"Copied file {file_name} from local folder to {dest_file}", is_raise_on_fail=False)
         else:
-            print("All required SQL files found in the user path.")
+            self.__print_log(backtrace=None, def_level="INFO", def_color="CYAN", def_module="DATABASE", def_msg="All required SQL files found in the user path.", is_raise_on_fail=False)
             
         all_sql_paths = sorted(self.path_to_sql.rglob("*_init_*.sql"), key=lambda x: int(Path(x).name.split("_")[0]))
-        sql_file_objects.extend([SqlFileObject(path=i, dict_of_values=self.settings) for i in all_sql_paths])
+        sql_file_objects.extend([SqlFileObject(path=i, dict_of_values=self.settings, is_create_python=self.__is_create_python_bridge) for i in all_sql_paths])
         
         try:
             cnx = connect(**self.config["MYSQL"])
-            if self.is_try_update_db:
+            if self.__is_try_update_db:
                 # TODO write db update
                 pass
             cnx.close()
             
-            self.log(level=1, data="Initializing skipped!")
+            self.log(level=1, text="Initializing skipped!")
         except mysql.connector.Error as err:
             if err.errno == ER_BAD_DB_ERROR:
                 try:
@@ -201,7 +230,7 @@ class WaveSQL:
                                     f"{error_text}\n"
                                 )
                                 try:
-                                    self.log(level=8, data=msg, err=ex, is_console_log=True, is_log_backtrace=False, is_raise_on_fail=True)
+                                    self.log(level=8, text=msg, err=ex, is_console_log=True, is_log_backtrace=False, is_raise_on_fail=True)
                                 except Exception:
                                     self.__print_log(backtrace=ex, def_module="DATABASE", def_msg=msg, is_raise_on_fail=True)
                                 quit(0)
@@ -211,35 +240,41 @@ class WaveSQL:
                     connection.close()
                 except Exception as ex:
                     try:
-                        self.log(level=8, data="Error initializing the database:", err=ex, is_console_log=True, is_log_backtrace=True, is_raise_on_fail=True)
+                        self.log(level=8, text="Error initializing the database:", err=ex, is_console_log=True, is_log_backtrace=True, is_raise_on_fail=True)
                     except Exception:
                         self.__print_log(backtrace=ex, def_module="DATABASE", def_msg="Error initializing the database:", is_raise_on_fail=True)
-                self.log(level=3, data="Database initialized!")
+                self.log(level=3, text="Database initialized!")
                 
-        if self.is_create_python_bridge:
+        if self.__is_create_python_bridge:
             queries_path = self.path_to_sql / "queries.sql"
             if os.path.exists(queries_path):
                 files = read_files_to_vars(directory=self.local_dir / "python")
                 
-                query_file = SqlFileQueries(path=queries_path, create_python=self.is_create_python_bridge, is_dictionary_default=self.is_dictionary, dict_of_values=self.settings)
+                query_file = SqlFileQueries(path=queries_path, create_python=self.__is_create_python_bridge, is_dictionary_default=self.is_dictionary, dict_of_values=self.settings)
                 
                 sql_queries_sync_lst = []
                 sql_queries_async_lst = []
+                
+                for sql_file in sql_file_objects:
+                    for sql_object in sql_file.sql_objects:
+                        if sql_object.can_python:
+                            sql_queries_sync_lst.append(sql_object.sync_python_code)
+                            sql_queries_async_lst.append(sql_object.async_python_code)
                 
                 for sql_query in query_file.sql_queries:
                     if sql_query.can_python:
                         sql_queries_sync_lst.append(sql_query.sync_python_code)
                         sql_queries_async_lst.append(sql_query.async_python_code)
                         
-                files["database.py"] += "\n" + "\n\n".join(sql_queries_sync_lst) + "\n\n\n" + 'db = WaveSQL(is_dictionary=True, is_console_log=True, is_log_backtrace=True, is_auto_start=True)\ndb.log(level=3, data="All is good!")\n'
-                files["asyncdatabase.py"] += "\n" + "\n\n".join(sql_queries_async_lst) + "\n\n\n" + 'async_db = AsyncWaveSQL(is_dictionary=True, is_console_log=True, is_log_backtrace=True, is_auto_start=True)\nasync_db.log(level=3, data="All is good!")\n'
+                files["database.py"] += "\n" + "\n\n".join(sql_queries_sync_lst) + "\n\n\n" + 'db = WaveSQL(is_dictionary=True, is_console_log=True, is_log_backtrace=True, is_auto_start=True)\ndb.log(level=3, text="All is good!")\n'
+                files["asyncdatabase.py"] += "\n" + "\n\n".join(sql_queries_async_lst) + "\n\n\n" + 'adb = AsyncWaveSQL(is_dictionary=True, is_console_log=True, is_log_backtrace=True, is_auto_start=True)\nadb.sync_log(level=3, text="All is good!")\n'
                 
                 for filename, content in files.items():
                     file_path = self.run_path / filename
                     with open(file_path, 'w', encoding='utf-8') as f:
                         f.write(content)
 
-        self.log(level=3, data="All is good !")
+        self.log(level=3, text="All is good !")
 
     def __db_connect(
         self,
@@ -286,7 +321,7 @@ class WaveSQL:
                     self.log(
                         level=8,
                         module="DATABASE",
-                        data=f"DB_CONNECT: {database}",
+                        text=f"DB_CONNECT: {database}",
                         err=err,
                         is_console_log=True
                     )
@@ -346,7 +381,7 @@ class WaveSQL:
             self.log(
                 level=8,
                 module="DATABASE",
-                data=f"DB_QUERY: {query}",
+                text=f"DB_QUERY: {query}",
                 err=err,
                 is_console_log=True
             )
@@ -407,7 +442,7 @@ class WaveSQL:
             self.log(
                 level=8,
                 module="DATABASE",
-                data=f"DB_PROCEDURE: {procedure_name}",
+                text=f"DB_PROCEDURE: {procedure_name}",
                 err=err,
                 is_console_log=True
             )
@@ -433,10 +468,10 @@ class WaveSQL:
         )
 
     def log(
-        self, data: str | Exception | Any = "", *args, level: int = 1,
-        sep: str = " ", module: str = "DATABASE", err: Exception | None = None,
+        self, text: str | Exception | Any = "", *args, level: int | None = None,
+        sep: str | None = None, module: str = None, err: Exception | None = None,
         is_console_log: bool | None = None, is_log_backtrace: bool | None = None,
-        is_raise_on_fail: bool | None = None, **kwargs
+        is_raise_on_fail: bool | None = None, is_pprint: bool | None = None, **kwargs
     ) -> None | Exception:
         """
         Logs a message or exception to the database and, if necessary, to the console.
@@ -458,22 +493,22 @@ class WaveSQL:
             - 8: ERROR — standard error (color: RED)
             - 9: FATAL ERROR — critical error requiring immediate attention (color: LIGHTRED)
 
-        data : Any, optional
+        text : Any, optional
             Message to log or exception object. Default is an empty string.
 
         module : str, optional
             Name of the module from which the log is sent. Default is "database".
 
         err : Exception, optional
-            Exception to log (if passed separately from `data`). Default is None.
+            Exception to log (if passed separately from `text`). Default is None.
 
         is_console_log : bool, optional
             Explicitly indicates whether to output the log to the console. If None, uses the value of `self.is_console_log`.
 
         Behavior
         --------
-        - Converts `data` to a string for logging.
-        - If an exception is passed (`err` or `data` is an `Exception`), formats the stack trace.
+        - Converts `text` to a string for logging.
+        - If an exception is passed (`err` or `text` is an `Exception`), formats the stack trace.
         - If `is_console_log=True`, additionally outputs the log to the console via `self.__print_log(...)`.
 
         Notes
@@ -482,14 +517,18 @@ class WaveSQL:
         """
         if is_console_log is None:
             is_console_log = self.is_console_log
-            
         if is_log_backtrace is None:
             is_log_backtrace = self.is_log_backtrace
-            
         if is_raise_on_fail is None:
             is_raise_on_fail = self.raise_log_on_fail
+        if sep is None:
+            sep = self.default_log_sep
+        if level is None:
+            level = self.default_log_level
+        if module is None:
+            module = self.default_log_module
 
-        parts = [str(data)] if data != "" else []
+        parts = [str(text)] if text != "" else []
         parts.extend(str(a) for a in args)
         if kwargs:
             # Опционально: можно форматировать kwargs как "key=value"
@@ -500,8 +539,8 @@ class WaveSQL:
 
         if isinstance(err, Exception):
             backtrace = "".join(traceback.format_exception(type(err), err, err.__traceback__))
-        elif isinstance(data, Exception):
-            backtrace = "".join(traceback.format_exception(type(data), data, data.__traceback__))
+        elif isinstance(text, Exception):
+            backtrace = "".join(traceback.format_exception(type(text), text, text.__traceback__))
         else:
             backtrace = ""
         try:
@@ -514,13 +553,13 @@ class WaveSQL:
         if is_console_log:
             if db_log == {} or db_log is None:
                 new_backtrace = (new_backtrace if new_backtrace else backtrace)
-                return self.__print_log(log=db_log, backtrace=new_backtrace, def_msg=msg, is_raise_on_fail=is_raise_on_fail)
+                return self.__print_log(log=db_log, backtrace=new_backtrace, def_msg=msg, is_raise_on_fail=is_raise_on_fail, is_pprint=is_pprint)
             else:
-                return self.__print_log(log=db_log, backtrace=(backtrace if is_log_backtrace and backtrace else None), is_raise_on_fail=is_raise_on_fail)
+                return self.__print_log(log=db_log, backtrace=(backtrace if is_log_backtrace and backtrace else None), is_raise_on_fail=is_raise_on_fail, is_pprint=is_pprint)
         
     def __print_log(
         self, log: dict | None = None, backtrace: str | None = None, def_level: str | None = "ERROR",
-        def_module: str | None = "logs", def_color: str | None = "RED",
+        def_module: str | None = "logs", def_color: str | None = "LIGHTRED",
         def_time: datetime | None = datetime.now(), def_msg: str | None = "Unloggable error !!!",
         is_raise_on_fail: bool | None = None, is_pprint: bool | None = None
     ) -> None | Exception:
@@ -539,8 +578,8 @@ class WaveSQL:
             # backtrace = log.get("", backtrace)
             print_mes = f"[{log_time_str}] [{log_level}] [{module}] {msg}"
         else:
-            print_mes = f"[{datetime.now().strftime("%d-%m-%Y %H:%M:%S")}] [ERROR] [logs] {def_msg}"
-            color = LOG_COLORS["LIGHTRED"]
+            print_mes = f"[{datetime.now().strftime("%d-%m-%Y %H:%M:%S")}] [{def_level}] [{def_module}] {def_msg}"
+            color = LOG_COLORS[f"{def_color}"]
             
         if backtrace is not None:
             print_mes = f"{print_mes}\n{backtrace}"
@@ -556,4 +595,4 @@ class WaveSQL:
 
 if __name__ == "__main__":
     db = WaveSQL(is_dictionary=True, is_console_log=True, is_log_backtrace=True, is_auto_start=True)
-    db.log(level=3, data="All is good!")
+    db.log(level=3, text="All is good!")

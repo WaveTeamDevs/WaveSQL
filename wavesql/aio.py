@@ -17,11 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class LogError(Exception):
-    def __init__(self, message, **kwargs):
-        super().__init__(self, message, **kwargs)
-        
+from .asyncdatabase import AsyncWaveSQL
 
-class SqlInitError(Exception):
-    def __init__(self, message, **kwargs):
-        super().__init__(self, message, **kwargs)
+__all__ = ['AsyncWaveSQL']

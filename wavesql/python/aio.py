@@ -6,6 +6,6 @@
 # Repo: https://github.com/WaveTeamDevs/WaveSQL
 # License: Apache-2.0 (see https://www.apache.org/licenses/LICENSE-2.0)
 
-from .database import db
+from .asyncdatabase import adb
 
-__all__ = ['db']
+__all__ = ['adb']

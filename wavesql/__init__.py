@@ -1,5 +1,10 @@
 # Copyright 2025 eelus1ve and the WaveTeam
 #
+# GitHub (author): https://github.com/eelus1ve
+# GitHub (organization): https://github.com/WaveTeamDevs
+# Repository: https://github.com/WaveTeamDevs/WaveSQL
+# Website: https://waveteam.net
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,7 +18,5 @@
 # limitations under the License.
 
 from .database import WaveSQL
-from .asyncdatabase import AsyncWaveSQL
-from .constants import PATH_DB_INIT_SCRIPTS, CONFIG_PATH
 
-__all__ = ['WaveSQL', 'AsyncWaveSQL', "PATH_DB_INIT_SCRIPTS", "CONFIG_PATH"]
+__all__ = ['WaveSQL']

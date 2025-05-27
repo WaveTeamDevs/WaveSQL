@@ -1,35 +1,37 @@
 # 🌊 WaveSQL
 
-**WaveSQL** — лёгкая, но мощная Python-библиотека для безопасной, синхронной и асинхронной работы с MySQL и MariaDB.
+[`Read this in Russian`](README.ru.md)
 
-> Разработано [`WaveTeam`](https://github.com/WaveTeamDevs) под руководством [`eelus1ve`](https://github.com/eelus1ve)
+**WaveSQL** is a lightweight yet powerful Python library for secure, synchronous and asynchronous interaction with MySQL and MariaDB.
 
----
-
-## 🚀 Возможности
-
-- 🔌 Простое подключение к базе данных через config.ini или словарь
-- ⚙️ Автоматическая инициализация структуры БД при первом запуске
-- 🧠 Поддержка вызова хранимых процедур (CALL)
-- 🪝 Защищённые методы (через @protected) — предотвращают прямой вызов критичных функций
-- 🐍 Асинхронная версия с аналогичным API
-- 🪵 Встроенное логирование в базу данных + цветной вывод в консоль (colorama)
-- 🧠 Автоматическая генерация Python-кода (Python Bridge) из SQL-файла
-- 🧩 Гибкая конфигурация: dictionary=True, цветной вывод, pprint, контроль backtrace
-- 🛡️ Отлавливание и логирование ошибок с трассировкой (traceback)
-- 🧪 Защита от неполных или отсутствующих SQL-файлов
+> Developed by [`WaveTeam`](https://github.com/WaveTeamDevs) under the leadership of [`eelus1ve`](https://github.com/eelus1ve)
 
 ---
 
-## 📦 Установка
+## 🚀 Features
+
+- 🔌 Easy database connection via config.ini or dictionary
+- ⚙️ Automatic database schema initialization on first run
+- 🧠 Support for calling stored procedures (CALL)
+- 🪝 Protected methods (via @protected) — prevent direct calls to critical ftextions
+- 🐍 Asynchronous version with the same API
+- 🪵 Built-in logging to database + colored console output (colorama)
+- 🧠 Automatic generation of Python code (Python Bridge) from SQL files
+- 🧩 Flexible configuration: dictionary=True, colored output, pprint, backtrace control
+- 🛡️ Error catching and logging with traceback
+- 🧪 Protection against missing or incomplete SQL files
+
+---
+
+## 📦 Installation
 
 ```bash
 pip install wavesql
 ```
 
-## 🧰 Использование
+## 🧰 Usage
 
-🔹 Простой пример
+🔹 Simple example
 ```python
 from wavesql import WaveSQL
 
@@ -40,40 +42,57 @@ db = WaveSQL(
     is_auto_start=True
 )
 
-db.log(level=3, data="All is good!")
+db.log(level=3, text="All is good!")
 
 ```
 
 ---
 
 
-## 🌀 Асинхронная версия
+## 🌀 Asynchronous version
 
 ```python
-from wavesql import AsyncWaveSQL
+from wavesql.aio import AsyncWaveSQL
 
-async_db = AsyncWaveSQL(
+adb = AsyncWaveSQL(
     is_dictionary=True,
     is_console_log=True,
     is_log_backtrace=True,
     is_auto_start=True
 )
 
-await async_db.log(level=3, data="Async logging works!")
+await adb.log(level=3, text="Async logging works!")
 ```
 
-# Все методы и поведение идентичны синхронной версии
-# Просто используйте await, и импортируйте из wavesql AsyncWaveSQL
+# All methods and behavior are identical to the synchronous version.
+# Just use await and import AsyncWaveSQL from wavesql.aio.
 
 ---
 
 
-## 🧠 Генерация Python-кода из SQL
+## 🧠 Generating Python code from SQL
 
 
-Если в вашей SQL-директории есть файл queries.sql, содержащий блоки -- name: some_query_name, WaveSQL может автоматически сгенерировать Python-код для вызова этих SQL-запросов.
+If your SQL directory contains a `queries.sql` file, WaveSQL can automatically generate Python code to call the SQL queries defined in it.
 
-Просто установите флаг is_create_python_bridge=True при инициализации:
+Example content of `queries.sql`:
+
+```sql
+create get_user with query SELECT * FROM users WHERE id = {% extend user_id : int %} LIMIT 1;
+```
+
+Explanation of syntax:
+
+- `create get_user` — declares the function/method name to be generated.
+
+- `with query` — keyword indicating the following is the SQL query.
+
+- Inside the query, `{% extend user_id : int %}` means the generated method will have a parameter `user_id` of type `int`.
+
+- The SQL query safely substitutes this parameter (with `%s` or equivalent) to prevent SQL injection.
+
+
+Simply enable the flag `is_create_python_bridge=True` during initialization:
 
 ```python
 
@@ -84,18 +103,24 @@ db = WaveSQL(
 
 ```
 
-В результате будут созданы файлы:
+The following files will be created:
 
-database.py – синхронный интерфейс
+- `database.py` — synchronous interface
 
-asyncdatabase.py – асинхронный интерфейс
+- `asyncdatabase.py` — asynchronous interface
+
+- `aio.py` — entry point for async API
+
+- `__init__.py` — entry point for sync API
+
+- library SQL files that initialize the database and create minimal necessary tables for proper module operation
 
 ---
 
 
-## 🧰 Использование c is_create_python_bridge=True
+## 🧰 Usage with is_create_python_bridge=True
 
-📁 Структура проекта (До запуска run.py)
+📁 Project structure (before running `run.py`):
 ```bash
 database/
 ├── sql/
@@ -104,7 +129,7 @@ database/
 ├── run.py
 ```
 
-🐍 Файл run.py
+🐍 run.py file:
 ```python
 from wavesql import WaveSQL
 
@@ -114,22 +139,28 @@ db = WaveSQL(
 )
 ```
 
-Файлы *_init_* инициализирются в базу данных в порядке возврастания цифры
+Files with names containing `_init_` and a numeric prefix (e.g., `0_init_users.sql`) are initialized in the database in ascending order of this number.
+The prefix must be a non-negative integer — negative values are reserved by the library.
 
-Файл queries.sql используется для автонаписания запросов на 2 моста
+The `queries.sql` file is used for automatic generation of query methods that create two bridges (sync and async).
 
-Пример queries.sql:
+Example `queries.sql`:
 ```sql
 create get_user with query SELECT * FROM users WHERE id = {% extend user_id : int %} LIMIT 1;
 ```
 
-Вывод:
+Output:
 ```python
-def get_user(self, user_id: int):
+# database.py
+def get_user(self, user_id: int) -> dict | None:
     return self._db_query("SELECT * FROM users WHERE id = %s LIMIT 1", (user_id, ), fetch=1)
+
+# asyncdatabase.py
+async def get_user(self, user_id: int) -> dict | None:
+    return await self._db_query("SELECT * FROM users WHERE id = %s LIMIT 1", (user_id, ), fetch=1)
 ```
 
-📁 Структура проекта (После запуска run.py)
+📁 Project structure (after running `run.py`):
 ```bash
 database/
 ├── sql/
@@ -146,19 +177,20 @@ database/
 ---
 
 
-## 🧾 Требования
+## 🧾 Requirements
 
 - Python 3.12.10+
-- mysql-connector-python
-- colorama
+- mysql-connector-python=9.3.0
+- colorama=0.4.6
 
 ---
 
-## 📁 Структура проекта
+## 📁 Project structure
 ```bash
 WaveSQL/
 ├── wavesql/
 │   ├── __init__.py
+│   ├── aio.py
 │   ├── sqlFileObject.py
 │   ├── constants.py
 │   ├── asyncdatabase.py
@@ -170,6 +202,7 @@ WaveSQL/
 │   │   └── 1_init_logs.sql
 │   ├── python/
 │   │   ├── __init__.py
+│   │   ├── aio.py
 │   │   ├── asyncdatabase.py
 │   │   └── database.py
 ├── README.md
@@ -181,17 +214,32 @@ WaveSQL/
 
 ---
 
+## 📜 Changelog
 
-## 👤 Автор
-- Darov Alexander (eelus1ve)
-- Email: darov-alexander@outlook.com
-- GitHub: [`@eelus1ve`](https://github.com/eelus1ve)
-- Разработано в рамках WaveTeam
+See [`CHANGELOG.md`](./CHANGELOG.md) for the detailed version history.
 
 ---
 
-## 🔗 Ссылки
-- 🌍 Репозиторий: [`github.com/WaveTeamDevs/WaveSQL`](https://github.com/WaveTeamDevs/WaveSQL)
-- 🧠 Организация: [`WaveTeamDevs`](https://github.com/WaveTeamDevs)
+## 🔮 Planned Features / Roadmap
+
+- [ ] SQLite support
+- [ ] Automatic SQL syntax validation
+- [ ] Automatic type mapping from SQL tables to Python code
+- [ ] Procedure output recognition
+- [ ] PostgreSQL support
+
+---
+
+## 👤 Author
+- Darov Alexander (eelus1ve)
+- Email: darov-alexander@outlook.com
+- GitHub: [`@eelus1ve`](https://github.com/eelus1ve)
+- Developed as part of [`WaveTeam`](https://github.com/WaveTeamDevs)
+
+---
+
+## 🔗 Links
+- 🌍 Repository: [`github.com/WaveTeamDevs/WaveSQL`](https://github.com/WaveTeamDevs/WaveSQL)
+- 🧠 Organization: [`WaveTeamDevs`](https://github.com/WaveTeamDevs)
 
 ---

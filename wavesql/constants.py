@@ -1,5 +1,10 @@
 # Copyright 2025 eelus1ve and the WaveTeam
 #
+# GitHub (author): https://github.com/eelus1ve
+# GitHub (organization): https://github.com/WaveTeamDevs
+# Repository: https://github.com/WaveTeamDevs/WaveSQL
+# Website: https://waveteam.net
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -39,3 +44,5 @@ LOG_COLORS = {
     "BLACK": Fore.BLACK,
     "LIGHTBLACK": Fore.LIGHTBLACK_EX,
 }
+
+no_python_names = ["insert_log"]
