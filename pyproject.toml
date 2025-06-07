@@ -1,6 +1,6 @@
 [project]
 name = "WaveSQL"
-version = "1.0.1"
+version = "1.0.2"
 description = "SQL helper for databases"
 readme = "README.md"
 requires-python = ">=3.12"

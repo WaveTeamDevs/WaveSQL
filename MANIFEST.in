@@ -1,4 +1,7 @@
 include README.md
+include README.ru.md
+include CHANGELOG.md
+include CHANGELOG.ru.md
 include LICENSE
 include NOTICE
 recursive-include wavesql *.ini

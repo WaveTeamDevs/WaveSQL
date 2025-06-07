@@ -1,6 +1,6 @@
 # 🌊 WaveSQL
 
-[`Read this in Russian`](README.ru.md)
+[`Read this in Russian`](https://github.com/WaveTeamDevs/WaveSQL/blob/main/README.ru.md)
 
 **WaveSQL** is a lightweight yet powerful Python library for secure, synchronous and asynchronous interaction with MySQL and MariaDB.
 
@@ -33,7 +33,7 @@ pip install wavesql
 
 🔹 Simple example
 ```python
-from wavesql import WaveSQL
+from wavesql.sync import WaveSQL
 
 db = WaveSQL(
     is_dictionary=True,
@@ -131,7 +131,7 @@ database/
 
 🐍 run.py file:
 ```python
-from wavesql import WaveSQL
+from wavesql.sync import WaveSQL
 
 db = WaveSQL(
     config="path_to_my_settings.ini", path_to_sql="database/sql", is_console_log=True,
@@ -168,7 +168,8 @@ database/
 │   ├── 1_init_logs.sql
 │   ├── 2_init_users.sql
 │   └── queries.sql
-├── __init__.py
+├── sync.py
+├── aio.py
 ├── asyncdatabase.py
 ├── database.py
 ├── run.py
@@ -189,7 +190,7 @@ database/
 ```bash
 WaveSQL/
 ├── wavesql/
-│   ├── __init__.py
+│   ├── sync.py
 │   ├── aio.py
 │   ├── sqlFileObject.py
 │   ├── constants.py
@@ -201,7 +202,7 @@ WaveSQL/
 │   │   ├── 0_init_db.sql
 │   │   └── 1_init_logs.sql
 │   ├── python/
-│   │   ├── __init__.py
+│   │   ├── sync.py
 │   │   ├── aio.py
 │   │   ├── asyncdatabase.py
 │   │   └── database.py
@@ -216,7 +217,7 @@ WaveSQL/
 
 ## 📜 Changelog
 
-See [`CHANGELOG.md`](./CHANGELOG.md) for the detailed version history.
+See [`CHANGELOG.md`](https://github.com/WaveTeamDevs/WaveSQL/blob/main/CHANGELOG.md) for the detailed version history.
 
 ---
 
@@ -227,6 +228,7 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for the detailed version history.
 - [ ] Automatic type mapping from SQL tables to Python code
 - [ ] Procedure output recognition
 - [ ] PostgreSQL support
+- [ ] Generation of APIs for other languages
 
 ---
 

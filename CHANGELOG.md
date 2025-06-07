@@ -1,5 +1,10 @@
 # 📄 Changelog
 
+## [1.0.2] - 2025-06-07
+### Changed
+- Moved synchronous database (`db`) initialization from `__init__.py` to `sync.py`. This improves resource loading control and reduces memory usage.
+- `__init__.py` no longer performs automatic initialization. To use the database, import explicitly from `wavesql.sync`.
+
 ## [1.0.1] - 2025-06-01
 ### Added
 - Generation of `__init__.py` and `aio.py` when using Python Bridge. Now the asynchronous database version is located in `wavesql.aio`.

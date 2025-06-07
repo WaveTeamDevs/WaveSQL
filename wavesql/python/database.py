@@ -6,7 +6,7 @@
 # Repo: https://github.com/WaveTeamDevs/WaveSQL
 # License: Apache-2.0 (see https://www.apache.org/licenses/LICENSE-2.0)
 
-from wavesql import WaveSQL
+from wavesql.sync import WaveSQL
 from typing import Literal
 from datetime import datetime
 from pathlib import Path
